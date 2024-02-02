@@ -14,7 +14,7 @@ const App:  FC = () => {
 
   return (
     <div>
-      <h1>{store.isAuth ? `Пользователь авторизован ${store.user.email}` : 'АВТОРИЗУЙТЕСЬ'}</h1>
+    <h1>{store.isAuth ? `Пользователь авторизован ${store.user && store.user.email}` : 'АВТОРИЗУЙТЕСЬ'}</h1>
       <LoginForm/>
     </div>
   );

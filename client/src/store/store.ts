@@ -7,8 +7,9 @@ import { API_URL } from "../http";
 
 
 export default class Store {
-    user = {} as IUser
-    isAuth =false
+    user = {} as IUser;
+    isAuth =false;
+    isLoading = false;
 
 
     constructor() {
@@ -20,6 +21,10 @@ export default class Store {
 
     setUser(user: IUser) {
         this.user = user
+    }
+
+    setLoading(bool: boolean) {
+        this.isLoading = bool;
     }
 
     async login(email: string, password: string) {
