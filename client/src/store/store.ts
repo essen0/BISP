@@ -8,19 +8,19 @@ import { API_URL } from "../http";
 
 export default class Store {
     user = {} as IUser;
-    isAuth =false;
+    isAuth = false;
     isLoading = false;
 
 
     constructor() {
-        makeAutoObservable(this)
+        makeAutoObservable(this);
     }
     setAuth(bool: boolean) {
-        this.isAuth = bool 
+        this.isAuth = bool ;
     }
 
     setUser(user: IUser) {
-        this.user = user
+        this.user = user;
     }
 
     setLoading(bool: boolean) {
@@ -28,6 +28,7 @@ export default class Store {
     }
 
     async login(email: string, password: string) {
+        this.setLoading(true)
         try {
             const response = await AuthService.login(email, password)
             console.log(response)
@@ -36,6 +37,8 @@ export default class Store {
             this.setUser(response.data.user)
         } catch (e: any) {
             console.log(e.response?.data?.message)
+        }finally {
+            this.setLoading(false)
         }
     }
     async registration(email:   string, password: string) {
@@ -51,15 +54,17 @@ export default class Store {
     }
     async logout() {
         try {
-            const response = await AuthService.logout()
-            localStorage.removeItem('token')
-            this.setAuth(false)
-            this.setUser( {} as IUser)
-        } catch (e: any) {
-            console.log(e.response?.data?.message)
+            const response = await AuthService.logout();
+            console.log(response)
+            localStorage.removeItem('token');
+            this.setAuth(false);
+            this.setUser({} as IUser);
+        } catch (e : any) {
+            console.log(e.response?.data?.message);
         }
     }
     async checkAuth() {
+        this.setLoading(true);
         try {
             const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {withCredentials: true})
             console.log(response);
@@ -68,6 +73,8 @@ export default class Store {
             this.setUser(response.data.user);
         } catch (e: any) {
             console.log(e.response?.data?.message);
+        }finally {
+            this.setLoading(false);
         }
     }
 }
