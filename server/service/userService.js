@@ -5,7 +5,6 @@ const mailService = require('./mailService')
 const tokenService = require('./tokenService')
 const UserDto = require('../dtos/userdto')
 const ApiError = require('../exceptions/apiError')
-const userModels = require('../models/userModels')
 
 class UserService {
 

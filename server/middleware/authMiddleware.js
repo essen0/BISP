@@ -12,10 +12,10 @@ module.exports = function (req,  res, next) {
             return next(ApiError.UnauthorizedError())
         }
 
-        const userData = tokenService.validateAccessToken(token)
-        if(!userData){
-            return next(ApiError.UnauthorizedError())
-        }
+        const userData = tokenService.validateAccessToken(accessToken)
+        // if(!userData){
+        //     return next(ApiError.UnauthorizedError())
+        // }
 
         req.user = userData;
         next();
