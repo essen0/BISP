@@ -41,6 +41,9 @@ class UserService {
         if (!user) {
             throw ApiError.BadRequest('Пользователь с таким email не найден')
         }
+        if(!user.isActivated){
+            throw ApiError.BadRequest('Активируйте аккаунт')
+        }
         const isPassEquals = await bcrypt.compare(password, user.password);
         if (!isPassEquals) {
             throw ApiError.BadRequest('Неверный пароль');
