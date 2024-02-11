@@ -71,6 +71,13 @@ class UserController {
             next(e);
         }
     }
+    async forgotPassword(req,res,next) {
+        try {
+            
+        } catch (e) {
+            console.log(e)
+        }
+    }
 }
 
 module.exports = new UserController()

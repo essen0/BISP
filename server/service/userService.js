@@ -5,6 +5,8 @@ const mailService = require('./mailService')
 const tokenService = require('./tokenService')
 const UserDto = require('../dtos/userdto')
 const ApiError = require('../exceptions/apiError')
+const { findOne } = require('../models/tokenModel')
+const userModels = require('../models/userModels')
 
 class UserService {
 
@@ -40,13 +42,11 @@ class UserService {
         if (!user) {
             throw ApiError.BadRequest('Пользователь с таким email не найден')
         }
-        if(!user.isActivated){
-            throw ApiError.BadRequest('Активируйте аккаунт')
-        }
         const isPassEquals = await bcrypt.compare(password, user.password);
         if (!isPassEquals) {
             throw ApiError.BadRequest('Неверный пароль');
         }
+        
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({...userDto});
 
@@ -79,6 +79,17 @@ class UserService {
     async getAllUsers() {
         const users = await UserModel.find();
         return users;
+    }
+    async forgotPassword(email) {
+        try {
+           const forgotenPassword = await UserModel.findOne({email}) 
+           if (candidate) {
+            throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} не существует`)
+            }
+            
+        } catch (e) {
+            close.log(e)
+        }
     }
 }
 
