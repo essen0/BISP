@@ -71,13 +71,16 @@ class UserController {
             next(e);
         }
     }
-    async forgotPassword(req,res,next) {
+    async forgotPassword(req, res, next){
         try {
-            
+            const {email} = req.body
+            const userData = await userService.forgotPassword(email);
+            return res.json(userData)
         } catch (e) {
-            console.log(e)
+            next(e)
         }
     }
+    
 }
 
 module.exports = new UserController()

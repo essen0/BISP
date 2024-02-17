@@ -6,7 +6,10 @@ const tokenService = require('./tokenService')
 const UserDto = require('../dtos/userdto')
 const ApiError = require('../exceptions/apiError')
 const { findOne } = require('../models/tokenModel')
-const userModels = require('../models/userModels')
+const Token = require('../models/tokenModel')
+const nodemailer = require('nodemailer')
+
+
 
 class UserService {
 
@@ -81,16 +84,52 @@ class UserService {
         return users;
     }
     async forgotPassword(email) {
-        try {
-           const forgotenPassword = await UserModel.findOne({email}) 
-           if (candidate) {
+        const user = await UserModel.findOne({email})
+        if (!user) {
             throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} не существует`)
-            }
-            
-        } catch (e) {
-            close.log(e)
         }
+
+        const userDto = new UserDto(user)
+        const token = await tokenService.generateResetToken({...userDto})
+        await tokenService.saveToken(userDto.id, token.resetToken)
+
+        const link = `${process.env.CLIENT_URL}/passwordReset?token=${tokenService.resetToken}`
+        
+        await mailService.sendForgorPassowrd(email, link)
+
+        return{
+            ...token,
+            user: userDto
+        }
+    }
+    async newPassword(email, password) {
+        const hashPassword = await bcrypt.hash(password, 3);
+        await UserModel.updateOne({email}, {password : hashPassword})
     }
 }
 
 module.exports = new UserService()
+
+
+//    const forgotenPassword = await UserModel.findOne({email}) 
+        //    if (!forgotenPassword) {
+        //     throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} не существует`)
+        //     }
+        //     const token = await tokenService.findOne(accessToken);
+        //     if(token) {
+        //         await token.removeToken()
+        //     }
+        //     let resetToken = crypto.randomBytes(32).toString("hex");
+        //     const hash = await bcrypt.hash(resetToken, Number(bcryptSalt));
+
+        //     await new Token({
+        //         user: user._id,
+        //         token: hash,
+        //         accessToken,
+        //         refreshToken
+        //       }).save();
+        //       const userDto = new UserDto(user);
+
+        //       const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${userDto._id}`;
+        //       sendEmail(userDto.email,`Password Reset Request,${link}`);
+        //       return link; 
