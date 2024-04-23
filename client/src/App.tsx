@@ -1,25 +1,22 @@
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
-import LoginForm from "./components/LoginForm"
 import { Context } from ".";
 import { observer } from "mobx-react-lite";
 import { IUser } from "./models/IUser";
 import UserService from "./services/UserService";
+import LoginForm from "./components/LoginForm";
+
 
 
 
 const App:  FC = () => {
   const {store} = useContext(Context)
   const [users, setUsers] = useState<IUser[]>([])
-  const initialized = useRef(false)
 
   useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true
       if(localStorage.getItem('token')) {
         console.log("here")
         store.checkAuth()
       }
-    }
   },[]);
 
   async function getUsers() {

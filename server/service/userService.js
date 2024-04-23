@@ -6,14 +6,14 @@ const tokenService = require('./tokenService')
 const UserDto = require('../dtos/userdto')
 const ApiError = require('../exceptions/apiError')
 const { findOne } = require('../models/tokenModel')
-const Token = require('../models/tokenModel')
-const nodemailer = require('nodemailer')
+const UserProfile = require('../models/userProfileModel'); // Подключаем модель профиля пользователя
+const userProfileModel = require('../models/userProfileModel')
 
 
 
 class UserService {
 
-    async registration(email, password) {
+    async registration(email, password, profileData = {}) {
         const candidate = await UserModel.findOne({email})
         if (candidate) {
             throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`)
@@ -24,11 +24,14 @@ class UserService {
         const user = await UserModel.create({email, password: hashPassword, activationLink})
         await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
 
+        // Создание пустого профиля пользователя
+        const userProfile = await UserProfile.create({ user: user._id, ...profileData }); 
+        console.log(userProfile);
         const userDto = new UserDto(user); // id, email, isActivated
         const tokens = tokenService.generateTokens({...userDto});
-        await tokenService.saveToken(userDto.id, tokens.refreshToken);
+        await tokenService.saveToken(userDto.id, tokens.refreshToken, userProfile._id );
 
-        return {...tokens, user: userDto}
+        return {...tokens, user: userDto,userProfile: userProfile['_id']}
     }
 
     async activate(activationLink) {
@@ -49,9 +52,15 @@ class UserService {
         if (!isPassEquals) {
             throw ApiError.BadRequest('Неверный пароль');
         }
+
+        const userP = await UserProfile.findOne({user: user._id})
+        if (!user) {
+            throw ApiError.BadRequest('Пользователь с таким email не найден')
+        }
         
         const userDto = new UserDto(user);
-        const tokens = tokenService.generateTokens({...userDto});
+        userDto.userProfile = userP._id
+        const tokens = tokenService.generateTokens({...userDto, });
 
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
         return {...tokens, user: userDto}
@@ -83,53 +92,55 @@ class UserService {
         const users = await UserModel.find();
         return users;
     }
-    async forgotPassword(email) {
-        const user = await UserModel.findOne({email})
-        if (!user) {
-            throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} не существует`)
-        }
 
-        const userDto = new UserDto(user)
-        const token = await tokenService.generateResetToken({...userDto})
-        await tokenService.saveToken(userDto.id, token.resetToken)
 
-        const link = `${process.env.CLIENT_URL}/passwordReset?token=${tokenService.resetToken}`
-        
-        await mailService.sendForgorPassowrd(email, link)
 
-        return{
-            ...token,
-            user: userDto
+    //////////////////////////////////////////////////    //////////////////////////////////////////////////
+    async getUserProfile(userProfile) {
+        try {
+            const userP = await UserProfile.findById(userProfile);
+            if (!userP) {
+                throw new Error('User profile not found');
+            }
+            return userP
+        } catch (e) {
+            throw e
         }
     }
-    async newPassword(email, password) {
-        const hashPassword = await bcrypt.hash(password, 3);
-        await UserModel.updateOne({email}, {password : hashPassword})
+    async updateUserProfile(userProfile, firstName, secondName, gender, age, address, placeWasBorn, telephoneNumber,idNumber) {
+        const data = {}
+        if(firstName){
+            data.firstName = firstName
+        }
+        if(secondName){
+            data.secondName = secondName
+        }
+        if(gender){
+            data.gender = gender
+        }
+        if(age){
+            data.age = age
+        }
+        if(address){
+            data.address = address
+        }
+        if(placeWasBorn){
+            data.placeWasBorn = placeWasBorn
+        }
+        if(telephoneNumber){
+            data.telephoneNumber = telephoneNumber
+        }
+        if(idNumber){
+            data.idNumber = idNumber
+        }
+        console.log(data)
+        const updatedP = await userProfileModel.findByIdAndUpdate(userProfile, data, {
+            new:true
+        })
+        console.log(updatedP)
+        return updatedP.save()
     }
+    
 }
 
 module.exports = new UserService()
-
-
-//    const forgotenPassword = await UserModel.findOne({email}) 
-        //    if (!forgotenPassword) {
-        //     throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} не существует`)
-        //     }
-        //     const token = await tokenService.findOne(accessToken);
-        //     if(token) {
-        //         await token.removeToken()
-        //     }
-        //     let resetToken = crypto.randomBytes(32).toString("hex");
-        //     const hash = await bcrypt.hash(resetToken, Number(bcryptSalt));
-
-        //     await new Token({
-        //         user: user._id,
-        //         token: hash,
-        //         accessToken,
-        //         refreshToken
-        //       }).save();
-        //       const userDto = new UserDto(user);
-
-        //       const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${userDto._id}`;
-        //       sendEmail(userDto.email,`Password Reset Request,${link}`);
-        //       return link; 

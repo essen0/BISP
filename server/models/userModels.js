@@ -5,8 +5,12 @@ const UserSchema = new Schema ({
     password: {type: String, required: true},
     isActivated: {type: Boolean, default: false},
     activationLink: {type: String},
-    resetPasswordToken: {type: String},
-    
+    role: {
+        type: String,
+        required: true,
+        enum: ['admin', 'patient', 'doctor'],
+        default: 'patient',
+    }
 })
 
 module.exports = model('Users', UserSchema)

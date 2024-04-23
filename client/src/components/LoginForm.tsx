@@ -1,11 +1,12 @@
 import React, { FC, useContext, useEffect, useState } from "react";
 import { Context } from "..";
-import {observer} from "mobx-react-lite";
+import {observer, useAsObservableSource} from "mobx-react-lite";
 
 
 const LoginForm: FC = () => {
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
+
     const {store} = useContext(Context)
 
     
@@ -25,6 +26,8 @@ const LoginForm: FC = () => {
           />  
           <button onClick={() => store.login(email,password)}>Login</button>
           <button onClick={() => store.registration(email,password)}>Registration</button>
+          <hr />
+          <a href="">Registration</a>
         </div>
     )
 }

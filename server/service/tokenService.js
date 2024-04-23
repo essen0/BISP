@@ -3,25 +3,11 @@ const tokenModel = require('../models/tokenModel')
 
 class TokenService {
     generateTokens(payload) {
-        const accessToken = jwt.sign(payload, process.env.JWT_ACCES_SECRET, {expiresIn: '15s'})
+        const accessToken = jwt.sign(payload, process.env.JWT_ACCES_SECRET, {expiresIn: '1d'})
         const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {expiresIn: '30d'})
         return {
             accessToken,
             refreshToken
-        }
-    }
-    generateResetToken(payload) {
-        const resetToken = jwt.sign(payload, process.env.JWT_RESET_SECRET, {expiresIn: '40m'})
-        return {
-            resetToken
-        }
-    }
-    validateResetToken(token){
-        try {
-           const userData = jwt.verify(token, process.env.JWT_RESET_SECRET) 
-           return userData
-        } catch (e) {
-            return null
         }
     }
     validateAccessToken(token) {
@@ -29,6 +15,7 @@ class TokenService {
             const userData = jwt.verify(token, process.env.JWT_ACCES_SECRET);
             return userData;
         } catch (e) {
+            console.log(e);
             return null;
         }
     }
@@ -38,17 +25,18 @@ class TokenService {
             const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
             return userData;
         } catch (e) {
+            console.log(e);
             return null;
         }
     }
 
-    async saveToken(userId, refreshToken) {
+    async saveToken(userId, refreshToken, userProfile) {
         const tokenData = await tokenModel.findOne({user: userId})
         if (tokenData) {
             tokenData.refreshToken = refreshToken;
             return tokenData.save();
         }
-        const token = await tokenModel.create({user: userId, refreshToken})
+        const token = await tokenModel.create({user: userId, refreshToken, userProfile: userProfile})
         return token;
     }
 

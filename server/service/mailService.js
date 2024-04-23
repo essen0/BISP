@@ -32,22 +32,6 @@ class MailService {
                 `
         })
     }
-    async sendForgorPassowrd(to,link) {
-        await this.transporter.sendMail({
-            from: process.env.SMTP_USER,
-            to,
-            subject: 'Ресет пароля пл ' + process.env.API_URL,
-            text: '',
-            html: 
-                `
-                <div>
-                    <h1>
-                        Для востановления пароля перейдите по этой <a href="${link}">ссылке</a>.
-                    </h1> 
-                </div>
-                `
-        })
-    }
 }
 
 module.exports = new MailService()

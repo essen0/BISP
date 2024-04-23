@@ -21,9 +21,7 @@ root.render(
   <Context.Provider value={{
     store
   }}>
-  <React.StrictMode>
     <App />
-  </React.StrictMode>
   </Context.Provider>
 
 

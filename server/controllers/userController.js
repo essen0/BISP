@@ -1,4 +1,4 @@
-const { ReturnDocument } = require('mongodb')
+const { ad } = require('mongodb')
 const userService = require('../service/userService')
 const {validationResult} = require('express-validator')
 const ApiError = require('../exceptions/apiError')
@@ -71,16 +71,34 @@ class UserController {
             next(e);
         }
     }
-    async forgotPassword(req, res, next){
-        try {
-            const {email} = req.body
-            const userData = await userService.forgotPassword(email);
-            return res.json(userData)
-        } catch (e) {
-            next(e)
+
+        //////////////////////////////////////////////////    //////////////////////////////////////////////////
+
+        async getUserProfile(req, res, next) {
+            try {
+                const userProfile = await userService.getUserProfile(req.user.userProfile);
+                if (!userProfile) {
+                    return res.status(404).send({ message: "User profile not found" });
+                }
+                res.json(userProfile);
+            } catch (e) {
+                next(e);
+            }
         }
-    }
-    
+        async updateUserProfile(req, res, next) {
+            try {
+                const {firstName, secondName, gender, age, address, placeWasBorn, telephoneNumber,idNumber} = req.body
+                const userProfile = req.user.userProfile;
+                const updatedProfile = await userService.updateUserProfile(userProfile, firstName, secondName, gender, age, address, placeWasBorn, telephoneNumber,idNumber);
+                res.status(200).json(updatedProfile);
+            } catch (e) {
+                console.log(e)
+                next(e)
+            }
+        }
+                
+
+
 }
 
 module.exports = new UserController()

@@ -5,8 +5,9 @@ const cookiesParser = require('cookie-parser')
 const mongoose = require('mongoose')
 const router = require('./routers/index.js')
 const errorMiddleware = require('./middleware/errorMiddleware.js')
+const morgan = require('morgan')
 
-const PORT = process.eventNames.PORT || 5000
+const PORT = process.env.PORT || 5000
 const app = express()
 
 app.use(express.json())
@@ -18,14 +19,21 @@ app.use(cors({
 app.use('/api', router)
 app.use(errorMiddleware)
 
- 
+// set up route logger tools
+app.use(morgan("dev"));
+app.use((req, res, next) => {
+  console.log(Date(Date.now()));
+    console.log(req.headers.origin || req.connection.remoteAddress);
+  next();
+}); 
+
 const start = async () => {
     try {
         await mongoose.connect(process.env.DB_URL, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         })
-        app.listen(PORT, () => console.log(`server started on PORT = ${PORT}`))
+        app.listen(PORT, () => console.log(`✅ PORT ${PORT}`))
     } catch (e) {
         console.log(e)
     }
