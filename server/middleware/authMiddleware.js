@@ -9,7 +9,7 @@ module.exports = function (req, res, next) {
             return next(ApiError.UnauthorizedError());
         }
 
-        const accessToken = authorizationHeader.split('Bearer ')[1];
+        const accessToken = authorizationHeader.split(' ')[1];
         if (!accessToken) {
             return next(ApiError.UnauthorizedError());
         }
@@ -18,9 +18,8 @@ module.exports = function (req, res, next) {
         // if (!userData) {
         //     return next(ApiError.UnauthorizedError());
         // }
-
+        console.log(userData);
         req.user = userData;
-        console.log(userData)
         next();
     } catch (e) {
         return next(ApiError.UnauthorizedError());

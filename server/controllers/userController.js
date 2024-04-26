@@ -1,7 +1,8 @@
 const { ad } = require('mongodb')
 const userService = require('../service/userService')
 const {validationResult} = require('express-validator')
-const ApiError = require('../exceptions/apiError')
+const ApiError = require('../exceptions/apiError');
+const userModels = require('../models/userModels');
 
 
 class UserController {
@@ -11,15 +12,14 @@ class UserController {
             if (!errors.isEmpty()) {
                 return next(ApiError.BadRequest('Ошибка при валидации', errors.array()))
             }
-            const {email, password} = req.body;
-            const userData = await userService.registration(email, password);
-            res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
+            const {email, password, role} = req.body;
+            const userData = await userService.registration(email, password, role);
+            res.cookie('refreshToken', userData.refreshToken, {maxAge: 60 * 24 * 60 * 60 * 1000, httpOnly: true})
             return res.json(userData);
         } catch (e) {
             next(e);
         }
     }
-
     async login(req, res, next) {
         try {
             const {email, password} = req.body;
@@ -71,16 +71,27 @@ class UserController {
             next(e);
         }
     }
+    async getAllDoctors(req, res, next) {
+        try {
+            const role = "doctor"; // Set the role statically as "doctor"
+            const doctors = await userService.getAllDoctors(role);
+            res.status(200).json(doctors);
+        } catch (error) {
+            console.error("Error in getDoctors:", error.message);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
 
         //////////////////////////////////////////////////    //////////////////////////////////////////////////
 
         async getUserProfile(req, res, next) {
             try {
-                const userProfile = await userService.getUserProfile(req.user.userProfile);
-                if (!userProfile) {
-                    return res.status(404).send({ message: "User profile not found" });
+                console.log(req.user.userProfile);
+                const ProfileId = await userService.getUserProfile(req.user.userProfile);
+                if (!ProfileId) {
+                    return res.status(404).send({ message: "User profile not found controller" });
                 }
-                res.json(userProfile);
+                res.json(ProfileId);
             } catch (e) {
                 next(e);
             }
@@ -96,9 +107,17 @@ class UserController {
                 next(e)
             }
         }
-                
-
-
+        async DeletUser(req,res,next){
+            try {
+                const usereId = req.user.id
+                await userModels.deleteOne({_id:usereId})
+                res.status(200).json({
+                message: "User account has been deleted"
+            })
+            } catch (e) {
+                console.log(e);
+            }
+        }
 }
 
 module.exports = new UserController()

@@ -12,8 +12,7 @@ const userProfileModel = require('../models/userProfileModel')
 
 
 class UserService {
-
-    async registration(email, password, profileData = {}) {
+    async registration(email, password, role, profileData = {}) {
         const candidate = await UserModel.findOne({email})
         if (candidate) {
             throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`)
@@ -21,11 +20,11 @@ class UserService {
         const hashPassword = await bcrypt.hash(password, 3);
         const activationLink = uuid.v4(); // v34fa-asfasf-142saf-sa-asf
 
-        const user = await UserModel.create({email, password: hashPassword, activationLink})
+        const user = await UserModel.create({email, password: hashPassword, activationLink, role})
         await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
 
         // Создание пустого профиля пользователя
-        const userProfile = await UserProfile.create({ user: user._id, ...profileData }); 
+        const userProfile = await UserProfile.create({ user: user._id }); 
         console.log(userProfile);
         const userDto = new UserDto(user); // id, email, isActivated
         const tokens = tokenService.generateTokens({...userDto});
@@ -81,7 +80,12 @@ class UserService {
             throw ApiError.UnauthorizedError();
         }
         const user = await UserModel.findById(userData.id);
+        const userP = await UserProfile.findOne({user: user._id})
+        if (!user) {
+            throw ApiError.BadRequest('Пользователь с таким email не найден')
+        }
         const userDto = new UserDto(user);
+        userDto.userProfile = userP._id
         const tokens = tokenService.generateTokens({...userDto});
 
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
@@ -92,19 +96,28 @@ class UserService {
         const users = await UserModel.find();
         return users;
     }
-
-
-
-    //////////////////////////////////////////////////    //////////////////////////////////////////////////
-    async getUserProfile(userProfile) {
+    async getAllDoctors(role){
+        if (!role) {
+            throw new Error("Role is required for fetching users.");
+        }
         try {
-            const userP = await UserProfile.findById(userProfile);
+            const users = await UserModel.find({ role: role });
+            return users;
+        } catch (error) {
+            console.error("Failed to retrieve users by role:", error);
+            throw error;
+        }
+    }
+    async getUserProfile(ProfileId) {
+        try {
+            console.log(ProfileId);
+            const userP = await UserProfile.findById(ProfileId);
             if (!userP) {
-                throw new Error('User profile not found');
+                throw new Error('User profile not found services');
             }
             return userP
         } catch (e) {
-            throw e
+            console.log(e);
         }
     }
     async updateUserProfile(userProfile, firstName, secondName, gender, age, address, placeWasBorn, telephoneNumber,idNumber) {
@@ -133,14 +146,12 @@ class UserService {
         if(idNumber){
             data.idNumber = idNumber
         }
-        console.log(data)
+        console.log(`${data}server data`)
         const updatedP = await userProfileModel.findByIdAndUpdate(userProfile, data, {
             new:true
         })
         console.log(updatedP)
         return updatedP.save()
     }
-    
 }
-
 module.exports = new UserService()

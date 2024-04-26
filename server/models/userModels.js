@@ -7,10 +7,10 @@ const UserSchema = new Schema ({
     activationLink: {type: String},
     role: {
         type: String,
-        required: true,
+        default: "patient",
         enum: ['admin', 'patient', 'doctor'],
-        default: 'patient',
-    }
+        required: true,
+    },
 })
 
 module.exports = model('Users', UserSchema)

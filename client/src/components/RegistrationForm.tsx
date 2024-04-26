@@ -1,9 +1,9 @@
 import React, { FC, useContext, useState } from "react";
-import styled from 'styled-components';
 import { observer } from "mobx-react-lite";
+import styled from "styled-components";
 import { Context } from "..";
 
-// Styled components definitions
+// Styled components for form, inputs, and button
 const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -39,6 +39,7 @@ const StyledButton = styled.button`
 const LoginForm: FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [role, setRole] = useState<string>('');
 
     const {store} = useContext(Context);
 
@@ -49,20 +50,26 @@ const LoginForm: FC = () => {
             value={email}
             type="text"
             placeholder="Email"
-          /> 
+          />
           <StyledInput 
             onChange={(e) => setPassword(e.target.value)}
             value={password}
             type="password"
             placeholder="Password"
-          />  
+          />
+          <StyledInput
+            onChange={(e) => setRole(e.target.value)}
+            value={role}
+            type="text"
+            placeholder="Doctor/User"
+          />
           <StyledButton 
-            onClick={() => store.login(email, password)}
+            onClick={() => store.registration(email, password, role)}
           >
-            Login
+            Registration
           </StyledButton>
         </FormContainer>
-    )
-}
+    );
+};
 
 export default observer(LoginForm);

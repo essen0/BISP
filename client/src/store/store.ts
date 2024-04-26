@@ -4,6 +4,7 @@ import AuthService from "../services/AuthServices";
 import axios from "axios";
 import { AuthResponse } from "../models/response/AuthResponse";
 import { API_URL } from "../http";
+import UserService from "../services/UserService";
 
 
 export default class Store {
@@ -32,7 +33,7 @@ export default class Store {
         try {
             const response = await AuthService.login(email, password)
             console.log(response)
-            localStorage.setItem('token', response.data.accesToken)
+            localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true)
             this.setUser(response.data.user)
         } catch (e: any) {
@@ -41,15 +42,24 @@ export default class Store {
             this.setLoading(false)
         }
     }
-    async registration(email:   string, password: string) {
+    async registration(email:   string, password: string, role: string) {
         try {
-            const response = await AuthService.registration(email, password)
+            const response = await AuthService.registration(email, password, role)
             console.log(response)
-            localStorage.setItem('token', response.data.accesToken)
+            localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true)
             this.setUser(response.data.user)
         } catch (e: any) {
             console.log(e.response?.data?.message)
+        }
+    }
+    async UpdateProfile(firstName: string, secondName: string, idNumber:string, gender: string, age: string, address:string, telephoneNumber:string) {
+        try {
+            const response = await UserService.updateUserProfile(firstName, secondName, idNumber, gender, age, address, telephoneNumber)
+            console.log(response);
+            
+        } catch (e:any) {
+            console.log(e);
         }
     }
     async logout() {
@@ -67,8 +77,10 @@ export default class Store {
         this.setLoading(true);
         try {
             const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {withCredentials: true})
-            console.log(response);
-            localStorage.setItem('token', response.data.accesToken);
+            // console.log(response);
+            localStorage.setItem('token', response.data.accessToken);
+            console.log(response.data.accessToken);
+            
             this.setAuth(true);
             this.setUser(response.data.user);
         } catch (e: any) {

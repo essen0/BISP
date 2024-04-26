@@ -16,5 +16,9 @@ router.post('/logout', userController.logout)
 router.get('/activate/:link', userController.activate)
 router.get('/refresh', userController.refresh)
 router.get('/users', authMiddleware, userController.getUsers)
+router.get('/doctors', authMiddleware, userController.getAllDoctors);
+router.delete('/delete-account', authMiddleware, userController.DeletUser);
+
+
 
 module.exports = router
