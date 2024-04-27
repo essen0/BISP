@@ -10,6 +10,7 @@ import RegistrationForm from "./components/RegistrationForm";
 import HomePage from "./components/HomePage";
 import UserProfile from "./components/UserProfile";
 import UserProfileForm from "./components/UserProfileForm";
+import ChatForm from "./components/ChatForm";
 
 
 const HeaderContainer = styled.header`
@@ -41,7 +42,36 @@ const LogoButton = styled.button`
     }
 `;
 
+const ButtonContainer = styled.div`
+    display: flex;
+    justify-content: center; // Center the buttons horizontally
+    gap: 10px; // Spacing between buttons
+    margin-top: 20px; // Margin from the top elements
 
+    .profile-btn,
+    .update-profile-btn,
+    .delete-account-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #0056b3;
+        }
+    }
+
+    .delete-account-btn {
+        background-color: red;
+        &:hover {
+            background-color: darkred;
+        }
+    }
+`;
 
 const App:  FC = () => {
   const {store} = useContext(Context)
@@ -72,13 +102,13 @@ const App:  FC = () => {
         await UserService.deleteAccount()
             .then(() => {
                 alert('Your account has been successfully deleted.');
-                // Redirect to login or home page after deletion
+                window.location.reload();
             })
             .catch(error => {
                 alert('Failed to delete account. Please try again.');
             });
     }
-};
+  };
 
   async function getUsers() {
     try {
@@ -88,13 +118,6 @@ const App:  FC = () => {
       console.log(e)
     }
   }
-  // async function Delete(){
-  //   try {
-  //     const response = await UserService.deleteAccount()
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // }
   if(store.isLoading) {
     return(
       <div><h1>Loading...</h1></div>
@@ -154,19 +177,23 @@ const App:  FC = () => {
                   <Button onClick={() => store.logout()}>Log out</Button>
                 </div>
       </HeaderContainer>
-      <Button onClick={() => handleChange('profile')}>Profile</Button>
-      <Button onClick={() => handleChange('ChangeProfile')}>UpdateProfile</Button>
-      <Button onClick={handleDeleteAccount} style={{ backgroundColor: 'red', color: 'white' }}>Delet Account</Button>
+      <h1>User is authorized {store.user.email}</h1> 
+      <ButtonContainer>
+                <Button className="profile-btn" onClick={() => handleChange('Chat')}>Chats</Button>
+                <Button className="profile-btn" onClick={() => handleChange('profile')}>Profile</Button>
+                <Button className="update-profile-btn" onClick={() => handleChange('ChangeProfile')}>Update Profile</Button>
+                <Button className="delete-account-btn" onClick={handleDeleteAccount}>Delete Account</Button>
+      </ButtonContainer>
       {activeForm === 'profile' && <UserProfile/>}
       {activeForm === 'ChangeProfile' && <UserProfileForm/>}
-      <h1>User is authorized {store.user.email}</h1> 
+      {activeForm === 'Chat' && <ChatForm/>}
       <div>
-      <button onClick={getUsers}>Get All Users</button>
+      {/* <button onClick={getUsers}>Get All Users</button>
       {users.map(user => 
         <div key={user.email}>
           {user.email}
         </div>
-        )}
+        )} */}
       </div>
     </div>
   );

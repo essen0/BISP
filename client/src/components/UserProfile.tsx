@@ -1,57 +1,92 @@
-import React, { useState, FormEvent, FC, useContext } from 'react';
+import React, { useState, FormEvent, FC, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import UserService from '../services/UserService';
-import { IUserProfile } from '../models/IUserProfile';
+
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    background-color: #f8f9fa;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+`;
+
+const Title = styled.h1`
+    color: #333;
+    font-size: 24px;
+    text-align: center;
+`;
+const InfoParagraph = styled.p`
+    font-size: 16px;
+    color: #666;
+    width: 100%;
+    padding: 5px 10px;
+    margin: 5px 0;
+    text-align: center;  // Align text to the center horizontally
+`;
+const Button = styled.button`
+    padding: 8px 16px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 20px 0;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #0056b3;
+    }
+`;
+
 
 
 const UserProfileForm: FC = () => {
-    const [firstName, setFirstName] = useState<string | undefined>('');
-    const [secondName, setSecondName] = useState<string | undefined>('');
-    const [idNumber, setIdNumber] = useState<string | undefined>('');
-    const [gender, setGender] = useState<string | undefined>('');
-    const [age, setAge] = useState<string | undefined>('');
-    const [address, setAddress] = useState<string | undefined>('');
-    const [telephoneNumber, settelephoneNumber] = useState<string | undefined>('');
+      
+    const [firstName, setFirstName] = useState<string | undefined>('no data yet');
+    const [secondName, setSecondName] = useState<string | undefined>('no data yet');
+    const [idNumber, setIdNumber] = useState<string | undefined>('no data yet');
+    const [gender, setGender] = useState<string | undefined>('no data yet');
+    const [age, setAge] = useState<string | undefined>('no data yet');
+    const [address, setAddress] = useState<string | undefined>('no data yet');
+    const [telephoneNumber, settelephoneNumber] = useState<string | undefined>('no data yet');
 
-    async function fetchUserProfile(){
-        try {
-            const response = await UserService.fetchUserProfileService()
-            console.log(response)
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const response = await UserService.fetchUserProfileService();
+                const userProfile = response.data;
+                setFirstName(userProfile.firstName)
+                setSecondName(userProfile.secondName)
+                setIdNumber(userProfile.idNumber)
+                setGender(userProfile.gender)
+                setAge(userProfile.age)
+                setAddress(userProfile.address)
+                settelephoneNumber(userProfile.telephoneNumber)
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
 
-            const { firstName, secondName, idNumber, gender, age, address, telephoneNumber } = response.data;
-
-            setFirstName(firstName)
-            setSecondName(secondName)
-            setIdNumber(idNumber)
-            setGender(gender)
-            setAge(age)
-            setAddress(address)
-            settelephoneNumber(telephoneNumber)
-
-            localStorage.setItem('firstName', firstName);
-            localStorage.setItem('secondName', secondName);
-            localStorage.setItem('idNumber', idNumber);
-            localStorage.setItem('gender', gender);
-            localStorage.setItem('age', age); // Convert number to string for storage
-            localStorage.setItem('address', address);
-            localStorage.setItem('telephoneNumber', telephoneNumber);
-
-        } catch (e : any) {
-            console.log(e.response?.data?.message);
-        }
-    }
+            }
+        };
+        fetchUserProfile();
+    }, []);
+    
     return (
-        <div>
-            <h1>User Profile</h1>
-            <button onClick={fetchUserProfile}>Refresh</button>
-            <p>First Name: {localStorage.getItem('firstName')}</p>
-            <p>Second Name: {localStorage.getItem('secondName')}</p>
-            <p>ID Number: {localStorage.getItem('idNumber')}</p>
-            <p>Gender: {localStorage.getItem('gender')}</p>
-            <p>Age: {localStorage.getItem('age')}</p>
-            <p>Address: {localStorage.getItem('address')}</p>
-            <p>Telephone Number: {localStorage.getItem('telephoneNumber')}</p>
-        </div>
+        <Container>
+            <Title>User Profile</Title>
+            {/* <Button onClick={fetchUserProfile}>Refresh</Button> */}
+            <InfoParagraph>First Name: {firstName}</InfoParagraph>
+            <InfoParagraph>Second Name: {secondName}</InfoParagraph>
+            <InfoParagraph>ID Number: {idNumber}</InfoParagraph>
+            <InfoParagraph>Gender: {gender}</InfoParagraph>
+            <InfoParagraph>Age: {age}</InfoParagraph>
+            <InfoParagraph>Address: {address}</InfoParagraph>
+            <InfoParagraph>Telephone Number: {telephoneNumber}</InfoParagraph>
+        </Container>
     );
 };
 

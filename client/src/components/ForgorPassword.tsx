@@ -1,8 +1,6 @@
-import React, { FC, useContext, useState } from "react";
-import styled from 'styled-components';
-import { observer } from "mobx-react-lite";
+import { FC, useContext, useState } from "react";
 import { Context } from "..";
-
+import { styled } from "styled-components";
 
 const FormContainer = styled.div`
   display: flex;
@@ -36,8 +34,9 @@ const StyledButton = styled.button`
   width: 100%;
 `;
 
+
 const LoginForm: FC = () => {
-    const [email, setEmail] = useState<string>('');
+    const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('');
 
     const {store} = useContext(Context);
@@ -50,16 +49,16 @@ const LoginForm: FC = () => {
             type="text"
             placeholder="Email"
           /> 
-          <StyledInput 
+          {/* <StyledInput 
             onChange={(e) => setPassword(e.target.value)}
             value={password}
             type="password"
             placeholder="Password"
-          />  
+          />   */}
           <StyledButton 
-            onClick={() => store.login(email, password)}
+            onClick={() => store.forgotPassword(email)}
           >
-            Login
+            Send reset Link
           </StyledButton>
         </FormContainer>
     )

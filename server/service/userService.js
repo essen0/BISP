@@ -6,7 +6,7 @@ const tokenService = require('./tokenService')
 const UserDto = require('../dtos/userdto')
 const ApiError = require('../exceptions/apiError')
 const { findOne } = require('../models/tokenModel')
-const UserProfile = require('../models/userProfileModel'); // Подключаем модель профиля пользователя
+const UserProfile = require('../models/userProfileModel')
 const userProfileModel = require('../models/userProfileModel')
 
 

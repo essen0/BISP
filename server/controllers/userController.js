@@ -63,7 +63,7 @@ class UserController {
         }
     }
 
-    async getUsers(req, res, next) {
+    async getAllUsers(req, res, next) {
         try {
             const users = await userService.getAllUsers();
             return res.json(users);
@@ -73,7 +73,7 @@ class UserController {
     }
     async getAllDoctors(req, res, next) {
         try {
-            const role = "doctor"; // Set the role statically as "doctor"
+            const role = "doctor"; 
             const doctors = await userService.getAllDoctors(role);
             res.status(200).json(doctors);
         } catch (error) {
@@ -81,8 +81,6 @@ class UserController {
             res.status(500).json({ message: "Internal server error" });
         }
     }
-
-        //////////////////////////////////////////////////    //////////////////////////////////////////////////
 
         async getUserProfile(req, res, next) {
             try {
@@ -117,6 +115,9 @@ class UserController {
             } catch (e) {
                 console.log(e);
             }
+        }
+        async sendMessage (req,res) {
+            console.log("message sent");
         }
 }
 
