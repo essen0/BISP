@@ -66,10 +66,9 @@ class SendMessage {
         try {
             const loggedInUserId = req.user.id
             const allDoctors = await User.find({
-                id: { $ne: loggedInUserId },
-                role: 'doctor' 
+                _id: { $ne: loggedInUserId },
             }).select("-password").select("-isActivated").select("-activationLink").select("-__v")
-            
+            console.log(allDoctors);
             res.json(allDoctors);
             
         } catch (e) {

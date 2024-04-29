@@ -3,7 +3,6 @@ import { observer } from "mobx-react-lite";
 import styled from "styled-components";
 import { Context } from "..";
 
-// Styled components for form, inputs, and button
 const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -36,10 +35,21 @@ const StyledButton = styled.button`
   width: 100%;
 `;
 
+const RadioContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+`;
+
+const RadioLabel = styled.label`
+  margin: 0 10px;
+  font-size: 16px;
+`;
+
 const LoginForm: FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [role, setRole] = useState<string>('');
+    const [role, setRole] = useState<string>('patient'); // Default to 'patient'
 
     const {store} = useContext(Context);
 
@@ -57,12 +67,28 @@ const LoginForm: FC = () => {
             type="password"
             placeholder="Password"
           />
-          <StyledInput
-            onChange={(e) => setRole(e.target.value)}
-            value={role}
-            type="text"
-            placeholder="Doctor/User"
-          />
+          <RadioContainer>
+            <RadioLabel>
+              <StyledInput 
+                type="radio"
+                name="role"
+                value="doctor"
+                checked={role === 'doctor'}
+                onChange={() => setRole('doctor')}
+              />
+              Doctor
+            </RadioLabel>
+            <RadioLabel>
+              <StyledInput 
+                type="radio"
+                name="role"
+                value="patient"
+                checked={role === 'patient'}
+                onChange={() => setRole('patient')}
+              />
+              User
+            </RadioLabel>
+          </RadioContainer>
           <StyledButton 
             onClick={() => store.registration(email, password, role)}
           >

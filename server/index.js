@@ -6,6 +6,8 @@ const mongoose = require('mongoose')
 const router = require('./routers/index.js')
 const errorMiddleware = require('./middleware/errorMiddleware.js')
 const morgan = require('morgan')
+const { Server } = require('socket.io');
+
 
 const PORT = process.env.PORT || 5000
 const app = express()
@@ -16,8 +18,6 @@ app.use(cors({
     credentials: true,
     origin: process.env.CLIENT_URL 
 }))
-app.use('/api', router)
-app.use(errorMiddleware)
 
 // set up route logger tools
 app.use(morgan("dev"));
@@ -26,6 +26,9 @@ app.use((req, res, next) => {
     console.log(req.headers.origin || req.connection.remoteAddress);
   next();
 }); 
+
+app.use('/api', router)
+app.use(errorMiddleware)
 
 const start = async () => {
     try {

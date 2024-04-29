@@ -3,6 +3,7 @@ import { AxiosResponse } from "axios";
 import { IUser } from "../models/IUser";
 import { IUserProfile } from "../models/IUserProfile"; 
 import { promises } from "dns";
+import { IMessage } from "../models/IMessage";
 
 export default class UserService {
     static fetchUsers(): Promise<AxiosResponse<IUser[]>> {
@@ -28,5 +29,27 @@ export default class UserService {
             throw error;  // Make sure to rethrow the error for further handling
         });
     }
+    static async getDoctorsChat(): Promise<AxiosResponse<IUser[]>>{
+        try {
+            const response = await $api.get<IUser[]>('/message/getDoctorChat')
+            return response
+        } catch (e) {
+            console.log(e);
+            throw e
+        }
+    }
+    static async sendMessage(userId: string, message: String): Promise<AxiosResponse<IMessage> | undefined> {
+        try {
+          const response = await $api.post<IMessage>(`/messages/send/${userId}`, { message });
+          return response;
+        } catch (e) {
+          console.log(e);
+          return undefined;
+        }
+      }
+      static async getMessages(userId:string): Promise<AxiosResponse<IMessage[]>>{
+        const response = await $api.get<IMessage[]>(`/messages/${userId}`)
+        return response
+      }
 }
 

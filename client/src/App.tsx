@@ -5,7 +5,7 @@ import { IUser } from "./models/IUser";
 import UserService from "./services/UserService";
 import LoginForm from "./components/LoginForm";
 import { styled } from "styled-components";
-import Button from "./components/Buttons/Button";
+
 import RegistrationForm from "./components/RegistrationForm";
 import HomePage from "./components/HomePage";
 import UserProfile from "./components/UserProfile";
@@ -41,46 +41,39 @@ const LogoButton = styled.button`
         outline: none;
     }
 `;
+const Button = styled.button`
+  padding: 8px 16px; // Adjusted padding for a medium-sized button
+  background-color: #f0f0f0; // Light gray background
+  color: black; // Text color is black
+  border: 1px solid #ccc; // Light gray border
+  border-radius: 5px; // Slightly rounded corners
+  cursor: pointer;
+  font-size: 16px; // Medium text size
+  transition: background-color 0.2s, color 0.2s; // Smooth transition for background and text color
 
-const ButtonContainer = styled.div`
-    display: flex;
-    justify-content: center; // Center the buttons horizontally
-    gap: 10px; // Spacing between buttons
-    margin-top: 20px; // Margin from the top elements
+  &:hover {
+    background-color: #007bff; // Blue color on hover
+    color: white; // Text color changes to white on hover
+  }
 
-    .profile-btn,
-    .update-profile-btn,
-    .delete-account-btn {
-        padding: 10px 20px;
-        font-size: 16px;
-        color: white;
-        background-color: #007bff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.2s;
+  &:focus {
+    outline: none; // Removes the outline on focus to maintain the style
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); // Adds a light blue box shadow on focus
+  }
 
-        &:hover {
-            background-color: #0056b3;
-        }
-    }
-
-    .delete-account-btn {
-        background-color: red;
-        &:hover {
-            background-color: darkred;
-        }
-    }
+  &:active {
+    background-color: #0056b3; // Darker blue when button is clicked
+  }
 `;
 
 const App:  FC = () => {
   const {store} = useContext(Context)
   const [users, setUsers] = useState<IUser[]>([])
 
-  const [now, setNow] = useState(new Date()); // State with initial value
+  const [now, setNow] = useState(new Date()); 
   const [activeForm, setActiveForm] = useState<string | null>(null);
   const handleChange = (form: string | null) => {
-        setActiveForm(form);  // Update the state to the selected form or null for HomePage
+        setActiveForm(form);  
   };
 
   useEffect(() => {
@@ -110,14 +103,7 @@ const App:  FC = () => {
     }
   };
 
-  async function getUsers() {
-    try {
-      const response = await UserService.fetchUsers()
-      setUsers(response.data)
-    } catch (e: any) {
-      console.log(e)
-    }
-  }
+
   if(store.isLoading) {
     return(
       <div><h1>Loading...</h1></div>
@@ -173,28 +159,19 @@ const App:  FC = () => {
                     <h1>TelemedicineUz</h1>
                 </LogoButton>
                 <span>Time is now: {now.toLocaleTimeString()}</span>
+                <Button className="profile-btn" onClick={() => handleChange('Chat')}>Chats</Button>
+                <Button className="profile-btn" onClick={() => handleChange('profile')}>Profile</Button>
+                <Button className="update-profile-btn" onClick={() => handleChange('ChangeProfile')}>Update Profile</Button>
+                <p>{store.user.email}</p>
+                <Button className="delete-account-btn" onClick={handleDeleteAccount}>Delete Account</Button>
                 <div>
                   <Button onClick={() => store.logout()}>Log out</Button>
                 </div>
       </HeaderContainer>
-      <h1>User is authorized {store.user.email}</h1> 
-      <ButtonContainer>
-                <Button className="profile-btn" onClick={() => handleChange('Chat')}>Chats</Button>
-                <Button className="profile-btn" onClick={() => handleChange('profile')}>Profile</Button>
-                <Button className="update-profile-btn" onClick={() => handleChange('ChangeProfile')}>Update Profile</Button>
-                <Button className="delete-account-btn" onClick={handleDeleteAccount}>Delete Account</Button>
-      </ButtonContainer>
+      {activeForm === null && <HomePage/>}
       {activeForm === 'profile' && <UserProfile/>}
       {activeForm === 'ChangeProfile' && <UserProfileForm/>}
       {activeForm === 'Chat' && <ChatForm/>}
-      <div>
-      {/* <button onClick={getUsers}>Get All Users</button>
-      {users.map(user => 
-        <div key={user.email}>
-          {user.email}
-        </div>
-        )} */}
-      </div>
     </div>
   );
 }

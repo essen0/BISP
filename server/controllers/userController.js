@@ -3,6 +3,7 @@ const userService = require('../service/userService')
 const {validationResult} = require('express-validator')
 const ApiError = require('../exceptions/apiError');
 const userModels = require('../models/userModels');
+const userProfileIdModel = require('../models/userProfileModel.js')
 
 
 class UserController {
@@ -108,7 +109,9 @@ class UserController {
         async DeletUser(req,res,next){
             try {
                 const usereId = req.user.id
-                await userModels.deleteOne({_id:usereId})
+                const userProfileId = req.user.userProfile
+                await userModels.findByIdAndDelete(usereId)
+                await userProfileIdModel.findByIdAndDelete(userProfileId)
                 res.status(200).json({
                 message: "User account has been deleted"
             })

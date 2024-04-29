@@ -12,7 +12,6 @@ export default class Store {
     isAuth = false;
     isLoading = false;
 
-
     constructor() {
         makeAutoObservable(this);
     }
@@ -89,5 +88,4 @@ export default class Store {
             this.setLoading(false);
         }
     }
-    
 }
