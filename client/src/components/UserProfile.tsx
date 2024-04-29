@@ -78,7 +78,6 @@ const UserProfileForm: FC = () => {
     return (
         <Container>
             <Title>User Profile</Title>
-            {/* <Button onClick={fetchUserProfile}>Refresh</Button> */}
             <InfoParagraph>First Name: {firstName}</InfoParagraph>
             <InfoParagraph>Second Name: {secondName}</InfoParagraph>
             <InfoParagraph>ID Number: {idNumber}</InfoParagraph>

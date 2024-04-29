@@ -26,7 +26,7 @@ export default class UserService {
             console.log('Account deleted successfully:', response.data);
         }).catch(error => {
             console.error('Error deleting account:', error);
-            throw error;  // Make sure to rethrow the error for further handling
+            throw error;  
         });
     }
     static async getDoctorsChat(): Promise<AxiosResponse<IUser[]>>{

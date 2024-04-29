@@ -23,7 +23,7 @@ class UserService {
         const user = await UserModel.create({email, password: hashPassword, activationLink, role})
         await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
 
-        // Создание пустого профиля пользователя
+        
         const userProfile = await UserProfile.create({ user: user._id }); 
         console.log(userProfile);
         const userDto = new UserDto(user); // id, email, isActivated

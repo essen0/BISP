@@ -49,7 +49,7 @@ const RadioLabel = styled.label`
 const LoginForm: FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [role, setRole] = useState<string>('patient'); // Default to 'patient'
+    const [role, setRole] = useState<string>('patient'); 
 
     const {store} = useContext(Context);
 
